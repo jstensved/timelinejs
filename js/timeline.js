@@ -24,20 +24,36 @@ define('timeline', ['jquery'], function($){
 			
 			// tod add auto adjustment to correct millisecond
 			
-			var current = Math.floor((new Date()).getTime() / 1000),
+			var thisref = this;
+			
+			var current = Math.floor((new Date()).getTime() / 1000) * 1000,
 				timer = null;
+				
 			
-			timer = setInterval(function(){
-				
-				
-				
-				console.log('currentSec: ' + currentSec);
-				
-				current++;
-				
-			}, this.settings.interval);
+			// todo
+			/*
+			 set time til next runt to next interval time.
+			 if there's been a glitch and a second has been skipped. run without pause until up to current time and on track.
+			*/
 			
+			var timeTilNextRun = 0;
 			
+			while(true){
+				
+			
+				setTimeout(function(){
+					
+					
+					
+					console.log('currentSec: ' + current);
+					
+					current += thisref.settings.interval;
+					
+				}, timeTilNextRun);
+				
+				
+			}
+		
 		},
 		
 		
