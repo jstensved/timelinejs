@@ -53,7 +53,7 @@ define('timeline', ['jquery'], function($){
 				var execTime = thisref.runEvents(nextRunTime);
 	
 	
-				console.log('runTime: ' + nextRunTime  + ', now: ' + (new Date()).getTime() + ', nowKey: ' + thisref.getTimeKey( (new Date()).getTime()) );
+				console.log('execTime: ' + execTime +', nextRunTime: ' + nextRunTime  + ', now: ' + (new Date()).getTime() + ', nowKey: ' + thisref.getTimeKey( (new Date()).getTime()) );
 	
 				if(execTime > thisref.settings.interval)
 				{
@@ -77,8 +77,8 @@ define('timeline', ['jquery'], function($){
 		// returns the run time
 		runEvents: function(time){
 			
-			var preExecTime = new Date(),
-				postExecTime = null;
+			var preExecTime = (new Date()).getTime();
+			
 			
 			// exec actual events
 			
@@ -95,11 +95,10 @@ define('timeline', ['jquery'], function($){
 				
 			}
 			
+			$(this).trigger('time', [time]);
 			
-			// calculate exec time
-			postExecTime = new Date();
-			
-			return postExecTime - preExecTime;
+			// return execution time			
+			return (new Date()).getTime() - preExecTime;
 
 		},
 		
