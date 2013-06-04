@@ -19,47 +19,105 @@ define('timeline', ['jquery'], function($){
 
 		},
 		
+		// calculate a floored time based on interval for time
+		getTimeKey: function(time){
+			
+			// note: is floor always right or should it round? or perhaps ceiling?
+			
+			return Math.floor( time / this.settings.interval) * this.settings.interval;
+		},
 		
 		run: function(){
 			
-			// tod add auto adjustment to correct millisecond
+			// set start to the closest past even time based on interval
+			var lastRun = this.getTimeKey((new Date()).getTime());
+			
+			this.runIncrement(lastRun);
+			
+		},
+		
+		runIncrement: function(lastRun){
+			
 			
 			var thisref = this;
 			
-			var current = Math.floor((new Date()).getTime() / 1000) * 1000,
-				timer = null;
+			var now = (new Date()).getTime(),
+				nextRunTime = lastRun + thisref.settings.interval,
+				timeUntilNextRun = nextRunTime - now,
+				delay = timeUntilNextRun > 0 ? timeUntilNextRun : 0;			
+				
+
+			setTimeout(function(){
+							
+				// run events for current time
+				var execTime = thisref.runEvents(nextRunTime);
+	
+	
+				console.log('runTime: ' + nextRunTime  + ', now: ' + (new Date()).getTime() + ', nowKey: ' + thisref.getTimeKey( (new Date()).getTime()) );
+	
+				if(execTime > thisref.settings.interval)
+				{
+					console.log('warning: execTime exceeds interval. execTime: ' +  execTime + ', diff: ' + execTime - thisref.settings.interval);
+				}
+						
+						
+				//console.log('execTime: ' + execTime);
+	
+				// schedule next
+				thisref.runIncrement(nextRunTime);
+				
+			}, delay);
+				
 				
 			
-			// todo
-			/*
-			 set time til next runt to next interval time.
-			 if there's been a glitch and a second has been skipped. run without pause until up to current time and on track.
-			*/
-			
-			var timeTilNextRun = 0;
-			
-			while(true){
-				
-			
-				setTimeout(function(){
-					
-					
-					
-					console.log('currentSec: ' + current);
-					
-					current += thisref.settings.interval;
-					
-				}, timeTilNextRun);
-				
-				
-			}
-		
 		},
 		
 		
+		// Run events for specific time
+		// returns the run time
+		runEvents: function(time){
+			
+			var preExecTime = new Date(),
+				postExecTime = null;
+			
+			// exec actual events
+			
+			if(time in this.events){			
+				
+				$.each(this.events[time], function(i, func){
+				
+					func();
+				
+				});
+				
+				// remove old callback to release memory
+				delete this.events[time];
+				
+			}
+			
+			
+			// calculate exec time
+			postExecTime = new Date();
+			
+			return postExecTime - preExecTime;
+
+		},
+		
+		
+		// add an event on a specific time
 		addTimedEvent: function(time, callback){
 		
-		
+			var key = this.getTimeKey(time);
+			
+			console.log('adding event at ' + key );
+			
+			
+			if(!(key in this.events)){
+				this.events[key] = new Array();	
+			}
+			
+			this.events[key].push(callback);
+	
 			
 		}
 		
