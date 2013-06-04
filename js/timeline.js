@@ -105,7 +105,7 @@ define('timeline', ['jquery'], function($){
 		
 		
 		// add an event on a specific time
-		addTimedEvent: function(time, callback){
+		add: function(time, callback){
 		
 			var key = this.getTimeKey(time);
 			
